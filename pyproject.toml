@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "quantum-hubbard"
+version = "0.1.0"
+description = "Hybrid quantum-classical simulations of the Fermi-Hubbard model"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "qiskit~=2.5.1",
+    "qiskit-aer>=0.17.2",
+    "qiskit-algorithms>=0.4.0",
+    "qiskit-nature>=0.8.0",
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "matplotlib>=3.8",
+    "jupyterlab>=4.0",
+    "ipykernel>=6.0",
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+
+[tool.ruff]
+line-length = 88
