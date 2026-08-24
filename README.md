@@ -1,0 +1,125 @@
+# Ground-State Simulation of the Two-Site Hubbard Model
+
+An educational quantum-computing project that solves the half-filled,
+two-site Fermi-Hubbard model in three independent ways:
+
+1. exact diagonalization (ED),
+2. a manual variational quantum eigensolver (VQE), and
+3. Qiskit Nature's VQE workflow.
+
+The goal is not to claim a quantum advantage for a four-qubit problem. It is to
+build and validate the complete path from a fermionic many-body Hamiltonian to
+a qubit representation and a hybrid quantum-classical ground-state algorithm.
+
+> **Project status:** Phase I (ground states) is implemented in noiseless
+> statevector simulation. Benchmarking and finite-shot experiments are planned
+> before Phase II, real-time dynamics.
+
+## Physical problem
+
+The project studies the open two-site Hubbard Hamiltonian
+
+$$
+H = -t\sum_{\sigma \in \{\uparrow,\downarrow\}}
+\left(c^\dagger_{0\sigma}c_{1\sigma}
++c^\dagger_{1\sigma}c_{0\sigma}\right)
++U\sum_{i=0}^{1}n_{i\uparrow}n_{i\downarrow}.
+$$
+
+There are four spin orbitals, mapped to four qubits with the Jordan-Wigner
+transformation. The calculations target the half-filled sector with two
+electrons and use $t=1$ as the energy unit. The worked example uses $U=4$.
+
+## Three solution paths
+
+| Method | What is implemented | Why it is included |
+| --- | --- | --- |
+| Exact diagonalization | Fermionic creation and annihilation matrices, explicit Hamiltonian construction, and diagonalization of the six-dimensional $N=2$ sector | Provides an analytic and numerical reference |
+| Manual VQE | Manual Jordan-Wigner operators, Pauli decomposition, a three-parameter symmetry-preserving ansatz, exact Pauli expectation values, and SciPy optimization | Exposes every layer hidden by a packaged VQE |
+| Qiskit Nature VQE | `FermiHubbardModel`, mode-order alignment, `JordanWignerMapper`, Hartree-Fock reference, six-parameter UCCSD ansatz, and Qiskit's `VQE` | Reproduces the result with a standard quantum simulation workflow |
+
+Both VQE implementations use exact statevector expectation values. They do not
+yet include finite-shot sampling, a noise model, or execution on quantum
+hardware.
+
+## Current result
+
+For $t=1$, $U=4$, and $N=2$, the analytic ground-state energy is
+
+$$
+E_0=\frac{U-\sqrt{U^2+16t^2}}{2}=-0.828427124746.
+$$
+
+| Quantity | ED | Manual VQE | Qiskit Nature VQE |
+| --- | ---: | ---: | ---: |
+| Ground-state energy | -0.8284271247 | -0.8284271247 | -0.8284271247 |
+| State fidelity with ED | 1.0 | 1.0 | 1.0 |
+| Total double occupancy | 0.14644661 | 0.14644661 | 0.14644661 |
+| $\langle\mathbf S_0\cdot\mathbf S_1\rangle$ | -0.64016504 | -0.64016504 | -0.64016504 |
+
+Agreement is checked with executable assertions, not only by comparing the
+final energy. The notebooks verify:
+
+- the canonical anticommutation relations and particle-number conservation;
+- equality between the explicit fermionic and Jordan-Wigner matrices;
+- every nonzero Pauli coefficient and the full $16\times16$ Hamiltonian;
+- the full spectrum and the half-filled spectrum;
+- the variational bound, ground-state fidelity, and particle number; and
+- double occupancy and inter-site spin correlation.
+
+## Notebooks
+
+The recommended reading order is:
+
+1. [`01_two_site_hubbard_ps.ipynb`](notebook/01_two_site_hubbard_ps.ipynb) —
+   first-principles ED, Jordan-Wigner mapping, Pauli decomposition, and manual
+   VQE using the spin-blocked orbital order
+   $[0\uparrow,1\uparrow,0\downarrow,1\downarrow]$.
+2. [`02_two_site_hubbard_qiskit_nature.ipynb`](notebook/02_two_site_hubbard_qiskit_nature.ipynb) —
+   the equivalent Qiskit Nature construction and UCCSD-VQE calculation,
+   cross-validated against the first notebook.
+
+[`01_two_site_hubbard_codex.ipynb`](notebook/01_two_site_hubbard_codex.ipynb)
+is an alternate first-principles version using a site-interleaved orbital
+ordering. Keeping both versions makes the effect of basis and qubit-ordering
+conventions explicit.
+
+## Run locally
+
+This project requires Python 3.10 or newer.
+
+```bash
+git clone https://github.com/petrashih/quantum-hubbard.git
+cd quantum-hubbard
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+jupyter lab
+```
+
+Open the notebooks in the order above and select the environment's Python
+kernel. A clean **Run All** in each primary notebook serves as the acceptance
+test; a failed physical or numerical comparison raises an assertion.
+
+## Skills demonstrated
+
+- second-quantized fermionic Hamiltonians and Fock-space sign conventions;
+- exact diagonalization in a conserved-particle-number sector;
+- Jordan-Wigner fermion-to-qubit mapping and Pauli decomposition;
+- symmetry-preserving variational ansatz design;
+- hybrid quantum-classical optimization with VQE;
+- Qiskit and Qiskit Nature model, mapper, ansatz, and estimator APIs; and
+- scientific validation through independent implementations and observables.
+
+## Next steps
+
+Before moving to dynamics, Phase I will be extended with:
+
+- a sweep over interaction strength $U/t$;
+- ansatz, optimizer, initialization, and convergence comparisons;
+- finite-shot energy and observable estimation;
+- circuit depth, parameter count, and measurement-cost reporting; and
+- automated plots and regression tests across all three methods.
+
+Phase II will then study real-time dynamics of the model, using the validated
+ground-state calculations as the reference point.
