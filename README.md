@@ -11,9 +11,10 @@ The goal is not to claim a quantum advantage for a four-qubit problem. It is to
 build and validate the complete path from a fermionic many-body Hamiltonian to
 a qubit representation and a hybrid quantum-classical ground-state algorithm.
 
-> **Project status:** Phase I (ground states) is implemented in noiseless
-> statevector simulation. Benchmarking and finite-shot experiments are planned
-> before Phase II, real-time dynamics.
+> **Project status:** The Phase I ground-state core is implemented and protected
+> by automated $U/t=4$ regression tests. Broader ansatz, optimizer, finite-shot,
+> and resource comparisons remain planned validation work and do not block the
+> start of Phase II, real-time dynamics.
 
 ## Physical problem
 
@@ -101,6 +102,44 @@ Open the notebooks in the order above and select the environment's Python
 kernel. A clean **Run All** in each primary notebook serves as the acceptance
 test; a failed physical or numerical comparison raises an assertion.
 
+The exact top-level versions used for the latest successful regression run are
+recorded in [`requirements-tested.txt`](requirements-tested.txt). The version
+ranges in `pyproject.toml` remain the normal installation source.
+
+## Automated regression tests
+
+The reusable implementation is organized as:
+
+```text
+src/quantum_hubbard/
+├── model.py          # Fock basis, fermionic operators, Hamiltonian, and ED
+├── operators.py      # Jordan-Wigner, Pauli, and Qiskit operator utilities
+└── observables.py    # double occupancy and spin correlation
+
+tests/
+├── test_two_site_reference.py
+├── test_qiskit_mapping.py
+└── test_vqe_regression.py
+```
+
+Run the deterministic physics and mapping tests during normal development:
+
+```bash
+pytest -m "not slow"
+```
+
+Run the complete suite, including the seeded manual and Qiskit VQE integration
+tests, before committing a physics or algorithm change:
+
+```bash
+pytest
+```
+
+The fixed $t=1$, $U=4$, $N=2$ tests preserve the trusted spectrum, ground-state
+energy, Pauli coefficients, double occupancy, spin correlation, particle
+number, and VQE fidelity. Numerical comparisons use explicit tolerances rather
+than exact floating-point equality.
+
 ## Skills demonstrated
 
 - second-quantized fermionic Hamiltonians and Fock-space sign conventions;
@@ -113,13 +152,13 @@ test; a failed physical or numerical comparison raises an assertion.
 
 ## Next steps
 
-Before moving to dynamics, Phase I will be extended with:
+Alongside the initial dynamics work, Phase I can be extended with:
 
 - a sweep over interaction strength $U/t$;
 - ansatz, optimizer, initialization, and convergence comparisons;
 - finite-shot energy and observable estimation;
 - circuit depth, parameter count, and measurement-cost reporting; and
-- automated plots and regression tests across all three methods.
+- automated plots and broader regression coverage across parameter sweeps.
 
 The prioritized experiments, metrics, and completion criteria are tracked in
 the [Phase I roadmap](TODO.md).

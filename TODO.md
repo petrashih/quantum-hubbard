@@ -1,13 +1,13 @@
-# Phase I Roadmap: Ground-State VQE
+# Phase I Validation and Benchmarking Backlog
 
-This roadmap strengthens the two-site Hubbard ground-state study before Phase
-II (dynamics). The aim is to turn the current proof of concept into a small,
-reproducible benchmark that explains not only whether VQE works, but also when
-and why it becomes difficult.
+This roadmap strengthens the two-site Hubbard ground-state study alongside
+Phase II (dynamics). The core $U/t=4$ calculation is already validated; this
+backlog turns it into a broader reproducible benchmark that explains not only
+whether VQE works, but also when and why it becomes difficult.
 
-## Definition of done for Phase I
+## Definition of done for the Phase I benchmark
 
-Phase I is complete when the repository contains:
+The broader Phase I benchmark is complete when the repository contains:
 
 - [ ] an exact-diagonalization reference across a documented $U/t$ grid;
 - [ ] a reproducible comparison of several ansätze and optimizers;
@@ -35,7 +35,7 @@ added near interesting transitions in behavior.
   evaluations, iterations, termination status, and wall-clock time.
 - [ ] Save machine-readable results (CSV or JSON) rather than copying values
   manually into plots.
-- [ ] Add regression assertions for the existing $U/t=4$ result.
+- [x] Add regression assertions for the existing $U/t=4$ result.
 
 **Deliverable:** one baseline table and plots of energy, absolute energy error,
 fidelity, double occupancy, and spin correlation versus $U/t$.
@@ -188,16 +188,16 @@ correlated, which part of the VQE workflow becomes harder for each ansatz?*
 - [ ] Create publication-quality figures with labeled axes, units, legends,
   seeds, and uncertainty bars where appropriate.
 - [ ] Update the README results and limitations from generated benchmark data.
-- [ ] Add an environment-lock file or otherwise record exact dependency
+- [x] Add an environment-lock file or otherwise record exact dependency
   versions used for the final results.
 - [ ] Ensure all notebooks run from a fresh environment without hidden state.
-- [ ] Add automated tests for Hamiltonians, mappings, conserved quantities,
+- [x] Add automated tests for Hamiltonians, mappings, conserved quantities,
   and benchmark reference values.
 - [ ] Write a short Phase I summary suitable for the project entry on a CV.
 
-## Minimum scope before Phase II
+## Minimum scope for the broader Phase I benchmark
 
 To keep Phase I bounded, the minimum milestone is Sections 1, 2 (three
 ansätze), 3 (three deterministic optimizers plus SPSA), 4, and 6. Mapping
 comparisons, symmetry tapering, adaptive ansätze, and hardware noise are useful
-extensions but should not block the move to dynamics.
+extensions. None of these backlog items blocks exploratory work on dynamics.

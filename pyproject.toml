@@ -36,6 +36,9 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: seeded VQE integration tests",
+]
 
 
 [tool.ruff]
