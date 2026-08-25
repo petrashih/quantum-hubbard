@@ -121,5 +121,8 @@ Before moving to dynamics, Phase I will be extended with:
 - circuit depth, parameter count, and measurement-cost reporting; and
 - automated plots and regression tests across all three methods.
 
+The prioritized experiments, metrics, and completion criteria are tracked in
+the [Phase I roadmap](TODO.md).
+
 Phase II will then study real-time dynamics of the model, using the validated
 ground-state calculations as the reference point.
