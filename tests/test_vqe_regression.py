@@ -1,4 +1,7 @@
-"""Seeded integration tests for the two existing noiseless VQE workflows."""
+"""
+Seeded integration tests for the two existing noiseless VQE workflows.
+This file tests the two noiseless VQE workflows. It contains helper functions and two actual pytest tests.
+"""
 
 import warnings
 
@@ -39,6 +42,10 @@ SYMMETRY_BASIS = (5, 9, 6, 10)
 
 
 def _two_level_rotation(state, a, b, theta):
+    """
+    This helper performs a rotation only between two computational basis states, \(|a\rangle\) and \(|b\rangle\).
+    The leading underscore means this is an internal helper, not a pytest test. Pytest only automatically runs functions whose names begin with test_.
+    """
     result = state.copy()
     amplitude_a, amplitude_b = state[a], state[b]
     result[a] = np.cos(theta) * amplitude_a - np.sin(theta) * amplitude_b
@@ -47,8 +54,12 @@ def _two_level_rotation(state, a, b, theta):
 
 
 def _manual_variational_state(theta):
+    """
+    This helper constructs the manual three-parameter VQE ansatz.
+    """
     state = np.zeros(16, dtype=complex)
-    state[SYMMETRY_BASIS[0]] = 1.0
+    state[SYMMETRY_BASIS[0]] = 1.0 # state 5, |1010⟩
+    ## three two-level rotations
     for target, angle in zip(SYMMETRY_BASIS[1:], theta, strict=True):
         state = _two_level_rotation(state, SYMMETRY_BASIS[0], target, angle)
     return state
@@ -56,6 +67,16 @@ def _manual_variational_state(theta):
 
 @pytest.mark.slow
 def test_manual_vqe_reproduces_reference_ground_state_and_observables():
+    """
+    To test that the manual ansatz and BFGS optimization can still reproduce the trusted ground-state energy, wavefunction, and observables.
+    
+    ---
+    The decorator
+    @pytest.mark.slow
+    labels this as a slower integration test because it runs a numerical optimizer.
+    It can be excluded with:
+    pytest -m "not slow"
+    """
     hamiltonian = hubbard_hamiltonian(t=T, u=U)
     pauli_terms = pauli_decomposition(hamiltonian)
     exact = solve_particle_sector(hamiltonian)
@@ -95,6 +116,9 @@ def test_manual_vqe_reproduces_reference_ground_state_and_observables():
 
 @pytest.mark.slow
 def test_seeded_qiskit_vqe_reproduces_reference_ground_state_and_observables():
+    """
+    
+    """
     warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     mapper = JordanWignerMapper()
     qubit_hamiltonian = mapper.map(qiskit_hubbard_fermionic_op(t=T, u=U)).simplify()
@@ -113,6 +137,7 @@ def test_seeded_qiskit_vqe_reproduces_reference_ground_state_and_observables():
         reps=2,
         initial_state=initial_state,
     )
+    ## The random seed is fixed at 7. Without a fixed seed, every test run would start from different parameters and could follow a different optimization path. A fixed seed makes the regression reproducible. The initial parameters are random but deterministic
     initial_point = 0.2 * np.random.default_rng(7).standard_normal(
         ansatz.num_parameters
     )
@@ -132,6 +157,7 @@ def test_seeded_qiskit_vqe_reproduces_reference_ground_state_and_observables():
     assert vqe_energy >= exact.ground_energy - ATOL
     assert abs(vqe_energy - EXPECTED_GROUND_ENERGY) < VQE_ATOL
     assert fidelity > 1 - VQE_ATOL
+    ## This confirms that the Hartree–Fock plus UCCSD construction remained in the intended sector.
     assert np.isclose(
         expectation(vqe_state, particle_number_operator()), 2.0, atol=ATOL
     )

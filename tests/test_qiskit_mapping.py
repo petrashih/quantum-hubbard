@@ -1,4 +1,15 @@
-"""Regression tests for the Qiskit Nature representation and mapping."""
+"""
+Regression tests for the Qiskit Nature representation and mapping.
+This file checks that Qiskit Nature translates the fermionic problem into the same qubit problem as the independent manual implementation.
+
+Qiskit fermionic operator
+        ↓
+Jordan–Wigner mapping              test_qiskit_mapping.py
+        ↓
+Qubit Hamiltonian
+
+
+"""
 
 import numpy as np
 from qiskit_nature.second_q.mappers import JordanWignerMapper
@@ -35,10 +46,15 @@ EXPECTED_PAULI_TERMS = {
 
 
 def test_qiskit_jordan_wigner_mapping_matches_fixed_reference():
+    ## constructing the trusted manual Hamiltonian
     reference_matrix = hubbard_hamiltonian(t=T, u=U)
+    ## Create Qiskit Jordan-Wigner mapper
     mapper = JordanWignerMapper()
+    ## Qiskit Nature constructs the fermionic Hamiltonian
     fermionic_operator = qiskit_hubbard_fermionic_op(t=T, u=U)
+    ## The fermionic operator is then mapped to qubits
     qubit_operator = mapper.map(fermionic_operator).simplify()
+    ## extracts Pauli dictionaries from two independent paths
     qiskit_terms = qiskit_pauli_dict(qubit_operator)
     manual_terms = pauli_decomposition(reference_matrix)
 
@@ -58,6 +74,9 @@ def test_qiskit_jordan_wigner_mapping_matches_fixed_reference():
 
 
 def test_qiskit_observable_mappings_match_first_principles_matrices():
+    """
+    This function checks physical observables rather than the Hamiltonian.
+    """
     mapper = JordanWignerMapper()
     qiskit_observables = qiskit_fermionic_observables()
 

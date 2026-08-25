@@ -1,4 +1,7 @@
-"""Physical observables for the canonical two-site Hubbard convention."""
+"""
+Physical observables for the canonical two-site Hubbard convention.
+expectation values, double occupancy, and spin correlation
+"""
 
 from __future__ import annotations
 

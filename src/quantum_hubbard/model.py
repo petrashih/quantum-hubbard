@@ -3,6 +3,8 @@
 The canonical convention is the spin-blocked orbital order
 ``[0 up, 1 up, 0 down, 1 down]``. Orbital 0 is the least-significant bit in
 the NumPy basis index.
+
+conventions, Fock basis, fermionic operators, Hamiltonian, particle sectors, and ED
 """
 
 from __future__ import annotations

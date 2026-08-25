@@ -1,4 +1,8 @@
-"""Qubit and Qiskit operator utilities for the two-site Hubbard model."""
+"""
+Qubit and Qiskit operator utilities for the two-site Hubbard model.
+
+manual Jordan–Wigner mapping, Pauli decomposition, and Qiskit operators
+"""
 
 from __future__ import annotations
 
