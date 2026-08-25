@@ -163,5 +163,34 @@ Alongside the initial dynamics work, Phase I can be extended with:
 The prioritized experiments, metrics, and completion criteria are tracked in
 the [Phase I roadmap](TODO.md).
 
-Phase II will then study real-time dynamics of the model, using the validated
-ground-state calculations as the reference point.
+## Phase II: quench dynamics
+
+Phase II will prepare the ground state $|\psi_0\rangle$ of an initial
+Hamiltonian $H_0$, suddenly change the interaction from $U_0$ to $U_1$, and
+evolve under the post-quench Hamiltonian,
+
+$$
+|\psi(t)\rangle=e^{-iH_1t}|\psi_0\rangle.
+$$
+
+The first target is a noiseless two-site interaction quench that reports the
+site-resolved double occupancy
+$D_i(t)=\langle n_{i\uparrow}n_{i\downarrow}\rangle_t$ and equal-time spin
+correlation $C_{ij}^{zz}(t)=\langle S_i^zS_j^z\rangle_t$. Validation has two
+levels:
+
+1. Exact classical propagation provides the pointwise reference for the
+   Trotterized quantum simulation. Acceptance checks cover the $t=0$ values,
+   state norm, post-quench energy, particle number, total $S^z$, and convergence
+   as the Trotter time step is reduced.
+2. A literature regression reproduces the closed-system ($\Gamma=0$)
+   $U_i/t=100\rightarrow U_f/t=5$ quench in
+   [Zavatti, Bellomia, and Capone](https://arxiv.org/abs/2605.18494), including
+   their per-site double occupancy
+   $\langle d(t)\rangle=\frac12\sum_i D_i(t)$. Its oscillation frequency must
+   agree with $E_+-E_-=\sqrt{U_f^2+16t^2}$ in units with $\hbar=1$.
+
+Implementation references include the
+[Qiskit real-time Trotterization tutorial](https://qiskit-community.github.io/qiskit-algorithms/tutorials/13_trotterQRTE.html)
+and the
+[OpenFermion/FQE Fermi-Hubbard tutorial](https://quantumai.google/openfermion/fqe/tutorials/fermi_hubbard).
