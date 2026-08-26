@@ -79,6 +79,9 @@ The recommended reading order is:
 2. [`02_two_site_hubbard_qiskit_nature.ipynb`](notebook/02_two_site_hubbard_qiskit_nature.ipynb) —
    the equivalent Qiskit Nature construction and UCCSD-VQE calculation,
    cross-validated against the first notebook.
+3. [`03_quench_dynamics.ipynb`](notebook/03_quench_dynamics.ipynb) — exact and
+   Trotterized real-time evolution after an interaction quench, including the
+   $U_i/t=100\rightarrow U_f/t=5$ Hubbard-dimer literature regression.
 
 [`01_two_site_hubbard_codex.ipynb`](notebook/01_two_site_hubbard_codex.ipynb)
 is an alternate first-principles version using a site-interleaved orbital
