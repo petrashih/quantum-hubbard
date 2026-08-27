@@ -124,8 +124,10 @@ src/quantum_hubbard/
 └── observables.py    # local, averaged, and trajectory observables
 
 tests/
+├── test_dynamics.py
 ├── test_two_site_reference.py
 ├── test_qiskit_mapping.py
+├── test_trotter_dynamics.py
 └── test_vqe_regression.py
 ```
 
@@ -144,8 +146,11 @@ pytest
 
 The fixed $t=1$, $U=4$, $N=2$ tests preserve the trusted spectrum, ground-state
 energy, Pauli coefficients, double occupancy, spin correlation, particle
-number, and VQE fidelity. Numerical comparisons use explicit tolerances rather
-than exact floating-point equality.
+number, and VQE fidelity. The Phase II tests additionally protect exact
+propagation, analytic dimer eigenstates, the $U_i/t=100\rightarrow U_f/t=5$
+literature regression, conservation laws, observable conventions, decomposed
+Suzuki circuits, and second-order Trotter convergence. Numerical comparisons
+use explicit tolerances rather than exact floating-point equality.
 
 ## Skills demonstrated
 
