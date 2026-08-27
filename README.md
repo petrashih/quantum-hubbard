@@ -1,49 +1,57 @@
-# Ground-State Simulation of the Two-Site Hubbard Model
+# Two-Site Hubbard Model: Ground States and Quench Dynamics
 
-An educational quantum-computing project that solves the half-filled,
-two-site Fermi-Hubbard model in three independent ways:
+An educational quantum-computing project that develops a validated simulation
+workflow for the half-filled, two-site Fermi-Hubbard model. The project begins
+with ground-state preparation and now extends to real-time evolution after an
+interaction quench.
 
-1. exact diagonalization (ED),
-2. a manual variational quantum eigensolver (VQE), and
-3. Qiskit Nature's VQE workflow.
+The goal is not to claim quantum advantage for a four-qubit system. The dimer
+is small enough to solve analytically and by exact diagonalization, making it a
+useful testbed for fermion-to-qubit mappings, variational algorithms, quantum
+time evolution, observables, and scientific validation.
 
-The goal is not to claim a quantum advantage for a four-qubit problem. It is to
-build and validate the complete path from a fermionic many-body Hamiltonian to
-a qubit representation and a hybrid quantum-classical ground-state algorithm.
+## Project phases
 
-> **Project status:** The Phase I ground-state core is implemented and protected
-> by automated $U/t=4$ regression tests. Broader ansatz, optimizer, finite-shot,
-> and resource comparisons remain planned validation work and do not block the
-> start of Phase II, real-time dynamics.
+| Phase | Scope | Status |
+| --- | --- | --- |
+| Phase I | Ground states from exact diagonalization, manual VQE, and Qiskit Nature VQE | Implemented and regression-tested |
+| Phase IIa | Sudden interaction quenches, exact propagation, analytic dimer dynamics, and Suzuki-Trotter circuits | Implemented and regression-tested |
+| Phase IIb | Unequal-time dynamical correlation and response functions | Next |
 
-## Physical problem
+Both VQE and real-time quantum calculations currently use noiseless statevector
+simulation. Finite-shot sampling, noise models, and quantum-hardware execution
+remain future work.
+
+## Physical model and conventions
 
 The project studies the open two-site Hubbard Hamiltonian
 
 $$
-H = -t\sum_{\sigma \in \{\uparrow,\downarrow\}}
+H(U) = -t\sum_{\sigma \in \{\uparrow,\downarrow\}}
 \left(c^\dagger_{0\sigma}c_{1\sigma}
 +c^\dagger_{1\sigma}c_{0\sigma}\right)
 +U\sum_{i=0}^{1}n_{i\uparrow}n_{i\downarrow}.
 $$
 
-There are four spin orbitals, mapped to four qubits with the Jordan-Wigner
-transformation. The calculations target the half-filled sector with two
-electrons and use $t=1$ as the energy unit. The worked example uses $U=4$.
+There are four spin orbitals in the canonical spin-blocked order
 
-## Three solution paths
+$$
+[0\uparrow,1\uparrow,0\downarrow,1\downarrow],
+$$
 
-| Method | What is implemented | Why it is included |
+mapped to four qubits with the Jordan-Wigner transformation. Calculations
+target half filling with $N_\uparrow=N_\downarrow=1$ and use $t=1$ as the
+energy unit, so time is expressed in units of $1/t$.
+
+## Phase I: ground-state simulation
+
+Phase I implements three independent solution paths:
+
+| Method | What is implemented | Role |
 | --- | --- | --- |
-| Exact diagonalization | Fermionic creation and annihilation matrices, explicit Hamiltonian construction, and diagonalization of the six-dimensional $N=2$ sector | Provides an analytic and numerical reference |
-| Manual VQE | Manual Jordan-Wigner operators, Pauli decomposition, a three-parameter symmetry-preserving ansatz, exact Pauli expectation values, and SciPy optimization | Exposes every layer hidden by a packaged VQE |
-| Qiskit Nature VQE | `FermiHubbardModel`, mode-order alignment, `JordanWignerMapper`, Hartree-Fock reference, six-parameter UCCSD ansatz, and Qiskit's `VQE` | Reproduces the result with a standard quantum simulation workflow |
-
-Both VQE implementations use exact statevector expectation values. They do not
-yet include finite-shot sampling, a noise model, or execution on quantum
-hardware.
-
-## Current result
+| Exact diagonalization | Explicit fermionic matrices, Hamiltonian construction, and diagonalization of the six-dimensional $N=2$ sector | Trusted classical reference |
+| Manual VQE | Manual Jordan-Wigner operators, Pauli decomposition, a symmetry-preserving ansatz, exact Pauli expectations, and SciPy optimization | Exposes the complete variational workflow |
+| Qiskit Nature VQE | `FermiHubbardModel`, mode-order alignment, `JordanWignerMapper`, Hartree-Fock preparation, UCCSD, and Qiskit's `VQE` | Standard-library reproduction |
 
 For $t=1$, $U=4$, and $N=2$, the analytic ground-state energy is
 
@@ -58,38 +66,129 @@ $$
 | Total double occupancy | 0.14644661 | 0.14644661 | 0.14644661 |
 | $\langle\mathbf S_0\cdot\mathbf S_1\rangle$ | -0.64016504 | -0.64016504 | -0.64016504 |
 
-Agreement is checked with executable assertions, not only by comparing the
-final energy. The notebooks verify:
+## Phase IIa: quench dynamics
 
-- the canonical anticommutation relations and particle-number conservation;
-- equality between the explicit fermionic and Jordan-Wigner matrices;
-- every nonzero Pauli coefficient and the full $16\times16$ Hamiltonian;
-- the full spectrum and the half-filled spectrum;
-- the variational bound, ground-state fidelity, and particle number; and
-- double occupancy and inter-site spin correlation.
+Phase IIa prepares the ground state $|\psi_0\rangle$ of an initial Hamiltonian
+$H(U_i)$, suddenly changes the interaction to $U_f$ at time zero, and evolves
+under the post-quench Hamiltonian:
+
+$$
+|\psi(\tau)\rangle=e^{-iH(U_f)\tau}|\psi_0\rangle.
+$$
+
+The implemented observables are the site-resolved and averaged double
+occupancy,
+
+$$
+D_i(\tau)=\langle n_{i\uparrow}n_{i\downarrow}\rangle_\tau,
+\qquad
+\langle d(\tau)\rangle=\frac12\sum_iD_i(\tau),
+$$
+
+and the equal-time longitudinal spin correlation
+
+$$
+C_{ij}^{zz}(\tau)=\langle\psi(\tau)|S_i^zS_j^z|\psi(\tau)\rangle.
+$$
+
+The Phase IIa backbone includes:
+
+- exact classical propagation under a time-independent Hamiltonian;
+- the analytic two-singlet solution of the Hubbard dimer;
+- reusable local and trajectory observable operators;
+- decomposed second-order Suzuki-Trotter step circuits;
+- repeated statevector circuit evolution;
+- norm, energy, particle-number, and total-$S^z$ checks; and
+- time-step convergence measurements against the exact trajectory.
+
+The literature regression uses the closed-system $U_i/t=100\rightarrow U_f/t=5$
+quench studied by
+[Zavatti, Bellomia, and Capone](https://arxiv.org/abs/2605.18494). The dynamics
+reproduce the analytical oscillation frequency and period
+
+$$
+\omega=E_+-E_-=\sqrt{U_f^2+16t^2}=\sqrt{41},
+\qquad
+T=\frac{2\pi}{\omega}=0.98126869.
+$$
+
+The analytic and exact trajectories have unit fidelity. The measured
+Suzuki-Trotter convergence order is $1.9949$, consistent with the expected
+global $O(\Delta\tau^2)$ error of a second-order formula.
+
+## Phase IIb: dynamical correlation functions
+
+Phase IIa measures an operator or equal-time product in the evolving state.
+Phase IIb will instead introduce unequal-time correlations such as
+
+$$
+C_{AB}(\tau,\tau')=
+\langle\psi_0|A_H(\tau)B_H(\tau')|\psi_0\rangle,
+\qquad
+A_H(\tau)=e^{iH_f\tau}Ae^{-iH_f\tau},
+$$
+
+and response functions such as
+
+$$
+\chi_{AB}^{R}(\tau,\tau')=
+-i\,\Theta(\tau-\tau')
+\langle[A_H(\tau),B_H(\tau')]\rangle.
+$$
+
+The first Phase IIb target will be a spin or density correlator with an exact
+classical reference, followed by a quantum-circuit measurement strategy and,
+where appropriate, a frequency-domain spectrum. Because a quenched initial
+state is generally not stationary under $H_f$, the full two-time dependence
+must be retained unless one time is fixed by the protocol.
 
 ## Notebooks
 
-The recommended reading order is:
+Recommended reading order:
+
+### Phase I
 
 1. [`01_two_site_hubbard_ps.ipynb`](notebook/01_two_site_hubbard_ps.ipynb) —
-   first-principles ED, Jordan-Wigner mapping, Pauli decomposition, and manual
-   VQE using the spin-blocked orbital order
-   $[0\uparrow,1\uparrow,0\downarrow,1\downarrow]$.
+   first-principles exact diagonalization, Jordan-Wigner mapping, Pauli
+   decomposition, and manual VQE.
 2. [`02_two_site_hubbard_qiskit_nature.ipynb`](notebook/02_two_site_hubbard_qiskit_nature.ipynb) —
-   the equivalent Qiskit Nature construction and UCCSD-VQE calculation,
-   cross-validated against the first notebook.
-3. [`03_quench_dynamics.ipynb`](notebook/03_quench_dynamics.ipynb) — exact and
-   Trotterized real-time evolution after an interaction quench, including the
-   $U_i/t=100\rightarrow U_f/t=5$ Hubbard-dimer literature regression.
-4. [`04_reusable_quench_experiment.ipynb`](notebook/04_reusable_quench_experiment.ipynb) —
-   the same validated quench expressed as a thin experiment that imports
-   analytic states, propagation, and observables from `src/quantum_hubbard`.
+   the equivalent Qiskit Nature construction and UCCSD-VQE workflow.
 
 [`01_two_site_hubbard_codex.ipynb`](notebook/01_two_site_hubbard_codex.ipynb)
-is an alternate first-principles version using a site-interleaved orbital
-ordering. Keeping both versions makes the effect of basis and qubit-ordering
-conventions explicit.
+is an alternate first-principles notebook using a site-interleaved orbital
+ordering. It is retained to make basis and qubit-ordering conventions explicit.
+
+### Phase IIa
+
+3. [`03_quench_dynamics.ipynb`](notebook/03_quench_dynamics.ipynb) — derivation
+   and first implementation of exact and Trotterized quench dynamics, including
+   the literature regression and detailed Suzuki-Trotter explanation.
+4. [`04_reusable_quench_experiment.ipynb`](notebook/04_reusable_quench_experiment.ipynb) —
+   the same validated quench written as a thin experiment that imports the
+   reusable physics operations from `src/quantum_hubbard`.
+
+## Reusable implementation
+
+```text
+src/quantum_hubbard/
+├── dynamics.py       # exact and Suzuki-Trotter real-time propagation
+├── model.py          # Fock basis, Hamiltonian, ED, and analytic dimer states
+├── operators.py      # Jordan-Wigner, Pauli, and Qiskit operator utilities
+└── observables.py    # local, averaged, and trajectory observables
+
+tests/
+├── test_dynamics.py
+├── test_qiskit_mapping.py
+├── test_trotter_dynamics.py
+├── test_two_site_reference.py
+└── test_vqe_regression.py
+```
+
+The automated suite currently contains 24 tests. It protects the fermionic
+algebra, fixed ground-state reference, qubit mappings, VQE results, exact
+propagation, analytic singlet states, observable conventions, conservation
+laws, the literature quench, decomposed Suzuki circuits, and second-order
+Trotter convergence.
 
 ## Run locally
 
@@ -105,33 +204,10 @@ jupyter lab
 ```
 
 Open the notebooks in the order above and select the environment's Python
-kernel. A clean **Run All** in each primary notebook serves as the acceptance
-test; a failed physical or numerical comparison raises an assertion.
+kernel. A clean **Run All** in each primary notebook is an executable acceptance
+check.
 
-The exact top-level versions used for the latest successful regression run are
-recorded in [`requirements-tested.txt`](requirements-tested.txt). The version
-ranges in `pyproject.toml` remain the normal installation source.
-
-## Automated regression tests
-
-The reusable implementation is organized as:
-
-```text
-src/quantum_hubbard/
-├── dynamics.py       # exact and Suzuki-Trotter real-time propagation
-├── model.py          # Fock basis, Hamiltonian, ED, and analytic dimer states
-├── operators.py      # Jordan-Wigner, Pauli, and Qiskit operator utilities
-└── observables.py    # local, averaged, and trajectory observables
-
-tests/
-├── test_dynamics.py
-├── test_two_site_reference.py
-├── test_qiskit_mapping.py
-├── test_trotter_dynamics.py
-└── test_vqe_regression.py
-```
-
-Run the deterministic physics and mapping tests during normal development:
+Run the deterministic tests during normal development:
 
 ```bash
 pytest -m "not slow"
@@ -144,65 +220,37 @@ tests, before committing a physics or algorithm change:
 pytest
 ```
 
-The fixed $t=1$, $U=4$, $N=2$ tests preserve the trusted spectrum, ground-state
-energy, Pauli coefficients, double occupancy, spin correlation, particle
-number, and VQE fidelity. The Phase II tests additionally protect exact
-propagation, analytic dimer eigenstates, the $U_i/t=100\rightarrow U_f/t=5$
-literature regression, conservation laws, observable conventions, decomposed
-Suzuki circuits, and second-order Trotter convergence. Numerical comparisons
-use explicit tolerances rather than exact floating-point equality.
+The exact top-level versions used for the latest successful regression run are
+recorded in [`requirements-tested.txt`](requirements-tested.txt). Package
+version ranges remain in `pyproject.toml`.
+
+## Remaining work
+
+The immediate priority is Phase IIb. Phase I and IIa can also be extended with:
+
+- sweeps over $U_i/t$, $U_f/t$, and evolution time;
+- ansatz, optimizer, and initialization comparisons;
+- finite-shot energy and observable estimation;
+- transpiled circuit depth and two-qubit gate counts;
+- noise models, mitigation, and hardware execution; and
+- broader regression coverage across parameter sweeps.
+
+The original Phase I experiments and completion criteria remain in the
+[Phase I roadmap](TODO.md).
+
+## References and implementation guides
+
+- [Exact Hubbard-dimer quench study](https://arxiv.org/abs/2605.18494)
+- [Qiskit real-time Trotterization tutorial](https://qiskit-community.github.io/qiskit-algorithms/tutorials/13_trotterQRTE.html)
+- [OpenFermion/FQE Fermi-Hubbard tutorial](https://quantumai.google/openfermion/fqe/tutorials/fermi_hubbard)
 
 ## Skills demonstrated
 
-- second-quantized fermionic Hamiltonians and Fock-space sign conventions;
-- exact diagonalization in a conserved-particle-number sector;
-- Jordan-Wigner fermion-to-qubit mapping and Pauli decomposition;
-- symmetry-preserving variational ansatz design;
-- hybrid quantum-classical optimization with VQE;
-- Qiskit and Qiskit Nature model, mapper, ansatz, and estimator APIs; and
-- scientific validation through independent implementations and observables.
-
-## Next steps
-
-Alongside the initial dynamics work, Phase I can be extended with:
-
-- a sweep over interaction strength $U/t$;
-- ansatz, optimizer, initialization, and convergence comparisons;
-- finite-shot energy and observable estimation;
-- circuit depth, parameter count, and measurement-cost reporting; and
-- automated plots and broader regression coverage across parameter sweeps.
-
-The prioritized experiments, metrics, and completion criteria are tracked in
-the [Phase I roadmap](TODO.md).
-
-## Phase II: quench dynamics
-
-Phase II will prepare the ground state $|\psi_0\rangle$ of an initial
-Hamiltonian $H_0$, suddenly change the interaction from $U_0$ to $U_1$, and
-evolve under the post-quench Hamiltonian,
-
-$$
-|\psi(t)\rangle=e^{-iH_1t}|\psi_0\rangle.
-$$
-
-The first target is a noiseless two-site interaction quench that reports the
-site-resolved double occupancy
-$D_i(t)=\langle n_{i\uparrow}n_{i\downarrow}\rangle_t$ and equal-time spin
-correlation $C_{ij}^{zz}(t)=\langle S_i^zS_j^z\rangle_t$. Validation has two
-levels:
-
-1. Exact classical propagation provides the pointwise reference for the
-   Trotterized quantum simulation. Acceptance checks cover the $t=0$ values,
-   state norm, post-quench energy, particle number, total $S^z$, and convergence
-   as the Trotter time step is reduced.
-2. A literature regression reproduces the closed-system ($\Gamma=0$)
-   $U_i/t=100\rightarrow U_f/t=5$ quench in
-   [Zavatti, Bellomia, and Capone](https://arxiv.org/abs/2605.18494), including
-   their per-site double occupancy
-   $\langle d(t)\rangle=\frac12\sum_i D_i(t)$. Its oscillation frequency must
-   agree with $E_+-E_-=\sqrt{U_f^2+16t^2}$ in units with $\hbar=1$.
-
-Implementation references include the
-[Qiskit real-time Trotterization tutorial](https://qiskit-community.github.io/qiskit-algorithms/tutorials/13_trotterQRTE.html)
-and the
-[OpenFermion/FQE Fermi-Hubbard tutorial](https://quantumai.google/openfermion/fqe/tutorials/fermi_hubbard).
+- fermionic Fock-space construction and sign conventions;
+- exact diagonalization in conserved-particle sectors;
+- Jordan-Wigner mapping and Pauli decomposition;
+- variational ground-state preparation;
+- analytic and numerical real-time propagation;
+- Suzuki-Trotter circuit synthesis and convergence analysis;
+- local, equal-time, and trajectory observables; and
+- independent scientific references and executable regression tests.
