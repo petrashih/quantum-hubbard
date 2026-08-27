@@ -10,6 +10,7 @@ conventions, Fock basis, fermionic operators, Hamiltonian, particle sectors, and
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -173,3 +174,61 @@ def analytic_ground_energy(t: float = 1.0, u: float = 4.0) -> float:
     """Return the half-filled two-site Hubbard ground-state energy."""
 
     return float((u - np.sqrt(u**2 + 16 * t**2)) / 2)
+
+
+def analytic_singlet_energies(t: float = 1.0, u: float = 4.0) -> tuple[float, float]:
+    """Return the lower and upper energies of the even-parity singlet block."""
+
+    if not np.isfinite(t) or t <= 0:
+        raise ValueError("t must be finite and positive")
+    if not np.isfinite(u):
+        raise ValueError("u must be finite")
+    gap = np.hypot(u, 4 * t)
+    return float((u - gap) / 2), float((u + gap) / 2)
+
+
+def analytic_singlet_state(
+    t: float = 1.0,
+    u: float = 4.0,
+    branch: Literal["ground", "excited"] = "ground",
+) -> ComplexVector:
+    """Return an analytic even-parity singlet in the canonical Fock basis.
+
+    The returned state uses the spin-blocked ordering
+    ``[0 up, 1 up, 0 down, 1 down]``. Fermionic reordering makes the two
+    singly occupied basis amplitudes have the same sign in this convention.
+    """
+
+    if not np.isfinite(t) or t <= 0:
+        raise ValueError("t must be finite and positive")
+    if not np.isfinite(u):
+        raise ValueError("u must be finite")
+    if branch not in {"ground", "excited"}:
+        raise ValueError("branch must be 'ground' or 'excited'")
+
+    scaled_interaction = u / (4 * t)
+    root = np.hypot(1.0, scaled_interaction)
+    if branch == "ground":
+        delta = (
+            scaled_interaction + root
+            if scaled_interaction >= 0
+            else 1 / (root - scaled_interaction)
+        )
+    else:
+        delta = (
+            scaled_interaction - root
+            if scaled_interaction <= 0
+            else -1 / (root + scaled_interaction)
+        )
+
+    state = np.zeros(HILBERT_DIMENSION, dtype=complex)
+    state[[5, 10]] = 1.0
+    state[[6, 9]] = delta
+    return state / np.sqrt(2 * (1 + delta**2))
+
+
+def dimer_quench_frequency(t: float = 1.0, u_final: float = 4.0) -> float:
+    """Return the singlet energy gap governing a sudden interaction quench."""
+
+    energy_minus, energy_plus = analytic_singlet_energies(t=t, u=u_final)
+    return energy_plus - energy_minus

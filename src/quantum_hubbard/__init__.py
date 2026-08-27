@@ -1,5 +1,10 @@
 """Reusable tools for the two-site quantum Hubbard project."""
 
+from quantum_hubbard.dynamics import (
+    build_suzuki_trotter_step,
+    exact_trajectory,
+    trotter_trajectory,
+)
 from quantum_hubbard.model import (
     HILBERT_DIMENSION,
     HOPPING_PAIRS,
@@ -8,15 +13,24 @@ from quantum_hubbard.model import (
     ONSITE_PAIRS,
     SPIN_BLOCKED_ORBITALS,
     analytic_ground_energy,
+    analytic_singlet_energies,
+    analytic_singlet_state,
     basis_indices,
+    dimer_quench_frequency,
     hubbard_hamiltonian,
     particle_number_operator,
     solve_particle_sector,
 )
 from quantum_hubbard.observables import (
+    average_double_occupancy_operator,
     double_occupancy_operator,
     expectation,
+    local_double_occupancy_operator,
     spin_correlation_operator,
+    spin_z_correlation_operator,
+    spin_z_operator,
+    total_spin_z_operator,
+    trajectory_expectation,
 )
 
 __all__ = [
@@ -27,11 +41,23 @@ __all__ = [
     "ONSITE_PAIRS",
     "SPIN_BLOCKED_ORBITALS",
     "analytic_ground_energy",
+    "analytic_singlet_energies",
+    "analytic_singlet_state",
+    "average_double_occupancy_operator",
     "basis_indices",
+    "build_suzuki_trotter_step",
+    "dimer_quench_frequency",
     "double_occupancy_operator",
+    "exact_trajectory",
     "expectation",
     "hubbard_hamiltonian",
+    "local_double_occupancy_operator",
     "particle_number_operator",
     "solve_particle_sector",
     "spin_correlation_operator",
+    "spin_z_correlation_operator",
+    "spin_z_operator",
+    "total_spin_z_operator",
+    "trajectory_expectation",
+    "trotter_trajectory",
 ]

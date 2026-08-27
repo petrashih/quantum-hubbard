@@ -82,6 +82,9 @@ The recommended reading order is:
 3. [`03_quench_dynamics.ipynb`](notebook/03_quench_dynamics.ipynb) — exact and
    Trotterized real-time evolution after an interaction quench, including the
    $U_i/t=100\rightarrow U_f/t=5$ Hubbard-dimer literature regression.
+4. [`04_reusable_quench_experiment.ipynb`](notebook/04_reusable_quench_experiment.ipynb) —
+   the same validated quench expressed as a thin experiment that imports
+   analytic states, propagation, and observables from `src/quantum_hubbard`.
 
 [`01_two_site_hubbard_codex.ipynb`](notebook/01_two_site_hubbard_codex.ipynb)
 is an alternate first-principles version using a site-interleaved orbital
@@ -115,9 +118,10 @@ The reusable implementation is organized as:
 
 ```text
 src/quantum_hubbard/
-├── model.py          # Fock basis, fermionic operators, Hamiltonian, and ED
+├── dynamics.py       # exact and Suzuki-Trotter real-time propagation
+├── model.py          # Fock basis, Hamiltonian, ED, and analytic dimer states
 ├── operators.py      # Jordan-Wigner, Pauli, and Qiskit operator utilities
-└── observables.py    # double occupancy and spin correlation
+└── observables.py    # local, averaged, and trajectory observables
 
 tests/
 ├── test_two_site_reference.py
