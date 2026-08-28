@@ -1,6 +1,6 @@
-# Two-Site Hubbard Model: Ground States and Quench Dynamics
+# hybrid quantum-classical algorithm for correlated fermion model
 
-An educational quantum-computing project that develops a validated simulation
+A quantum-computing project that develops a validated simulation
 workflow for the half-filled, two-site Fermi-Hubbard model. The project begins
 with ground-state preparation and now extends to real-time evolution after an
 interaction quench.
