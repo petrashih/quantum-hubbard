@@ -224,19 +224,18 @@ The exact top-level versions used for the latest successful regression run are
 recorded in [`requirements-tested.txt`](requirements-tested.txt). Package
 version ranges remain in `pyproject.toml`.
 
-## Remaining work
+## Roadmap
 
-The immediate priority is Phase IIb. Phase I and IIa can also be extended with:
+The active plan, with weekly milestones for Phase IIb, is in
+[`ROADMAP.md`](ROADMAP.md). The earlier Phase I benchmark backlog (ansatz and
+optimizer comparisons, mapping comparisons, symmetry tapering) is deferred in
+[`docs/phase1-backlog.md`](docs/phase1-backlog.md).
 
-- sweeps over $U_i/t$, $U_f/t$, and evolution time;
-- ansatz, optimizer, and initialization comparisons;
-- finite-shot energy and observable estimation;
-- transpiled circuit depth and two-qubit gate counts;
-- noise models, mitigation, and hardware execution; and
-- broader regression coverage across parameter sweeps.
+Planned extensions beyond Phase IIb:
 
-The original Phase I experiments and completion criteria remain in the
-[Phase I roadmap](TODO.md).
+- finite-shot estimation and transpiled circuit resource counts;
+- scaling to larger lattices with a classical tensor-network baseline;
+- noise models, mitigation, and hardware execution.
 
 ## References and implementation guides
 
