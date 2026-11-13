@@ -42,7 +42,7 @@ SYMMETRY_BASIS = (5, 9, 6, 10)
 
 
 def _two_level_rotation(state, a, b, theta):
-    """
+    r"""
     This helper performs a rotation only between two computational basis states, \(|a\rangle\) and \(|b\rangle\).
     The leading underscore means this is an internal helper, not a pytest test. Pytest only automatically runs functions whose names begin with test_.
     """
@@ -116,9 +116,7 @@ def test_manual_vqe_reproduces_reference_ground_state_and_observables():
 
 @pytest.mark.slow
 def test_seeded_qiskit_vqe_reproduces_reference_ground_state_and_observables():
-    """
-    
-    """
+    """Seeded Qiskit Nature VQE matches the ED ground state and observables."""
     warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
     mapper = JordanWignerMapper()
     qubit_hamiltonian = mapper.map(qiskit_hubbard_fermionic_op(t=T, u=U)).simplify()
