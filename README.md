@@ -1,5 +1,7 @@
 # hybrid quantum-classical algorithm for correlated fermion model
 
+[![tests](https://github.com/petrashih/quantum-hubbard/actions/workflows/tests.yml/badge.svg)](https://github.com/petrashih/quantum-hubbard/actions/workflows/tests.yml)
+
 A quantum-computing project that develops a validated simulation
 workflow for the half-filled, two-site Fermi-Hubbard model. The project begins
 with ground-state preparation and now extends to real-time evolution after an
