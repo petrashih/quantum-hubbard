@@ -1,5 +1,6 @@
 """Reusable tools for the two-site quantum Hubbard project."""
 
+from quantum_hubbard.correlators import two_time_correlator
 from quantum_hubbard.dynamics import (
     build_suzuki_trotter_step,
     exact_trajectory,
@@ -60,4 +61,5 @@ __all__ = [
     "total_spin_z_operator",
     "trajectory_expectation",
     "trotter_trajectory",
+    "two_time_correlator",
 ]
