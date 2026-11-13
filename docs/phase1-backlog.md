@@ -1,3 +1,8 @@
+> **Status: deferred.** This is the original Phase I validation and
+> benchmarking backlog (written in mid-2026). The active plan is in
+> [`ROADMAP.md`](../ROADMAP.md). Items here are optional extensions, to be
+> picked up after Phase IIb.
+
 # Phase I Validation and Benchmarking Backlog
 
 This roadmap strengthens the two-site Hubbard ground-state study alongside
